@@ -34,4 +34,3 @@ def edit(request,todo_id):
     return render(request,'index.html',{'todo':Todo,'edit_mode':True,'todos':todo.objects.all()})
 
 
-
