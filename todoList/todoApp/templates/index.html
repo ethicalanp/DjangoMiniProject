@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Todo List</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #aac0e2;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        h1 {
+            text-align: center;
+            color: #2d3748;
+            margin-bottom: 30px;
+            font-size: 32px;
+            font-weight: 600;
+        }
+        .add-todo {
+            background-color: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+        input[type="text"] {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: border-color 0.3s;
+        }
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #4a5568;
+        }
+        .add-btn {
+            padding: 12px 24px;
+            background-color: #2d3748;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        .add-btn:hover {
+            background-color: #1a202c;
+        }
+        .todo-list {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+        .todo-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            border-bottom: 1px solid #e2e8f0;
+            transition: background-color 0.2s;
+        }
+        .todo-item:last-child {
+            border-bottom: none;
+        }
+        .todo-item:hover {
+            background-color: #f7fafc;
+        }
+        .todo-text {
+            flex: 1;
+            color: #2d3748;
+            font-size: 15px;
+        }
+        .todo-actions {
+            display: flex;
+            gap: 12px;
+        }
+        .icon-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            transition: transform 0.2s;
+        }
+        .icon-btn:hover {
+            transform: scale(1.1);
+        }
+        .complete-icon {
+            color: #48bb78;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .todo-item.completed {
+            background-color: #f0fff4;
+            opacity: 0.8;
+        }
+        .todo-item.completed .todo-text {
+            color: #a0aec0;
+            text-decoration: line-through;
+        }
+        .edit-icon {
+            color: #4a5568;
+            font-size: 18px;
+        }
+        .delete-icon {
+            color: #e53e3e;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #729fd9;
+        }
+        .todo-list-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            border: 2px solid #e2e8f0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>My Todo List</h1>
+        
+        <div class="add-todo">
+            <form method="POST" action="{% if edit_mode %}{% url 'edit' todo.id %}{% else %}{% url 'todo_list' %}{% endif %}">
+                {% csrf_token %}
+                <div class="input-group">
+                    {% if edit_mode %}
+                        <input type="text" name="task" value="{{todo.task}}" placeholder="Edit Task " required>
+                        <button type="submit" class="add-btn">Update</button>
+                    {% else %}
+                        <input type="text" name="task" placeholder="Add a new task..." required>
+                        <button type="submit" class="add-btn">Add</button>
+                    {% endif %}
+                </div>
+            </form>
+        </div>
+
+        <div class="todo-list-container">
+            {% if todos %}
+                {% for todo in todos %}
+                <div class="todo-item">
+                    <span class="todo-text">{{ todo.task }}</span>
+                    <div class="todo-actions">
+                        {% if not todo.complete %}
+                            <a href="{% url 'complete' todo.id %}" class="icon-btn complete" title="Complete">○</a>
+                        {% else %}
+                            <span class="icon-btn complete" title="Completed"><span  class="complete-icon">✓</span></span>
+                        {% endif %}
+                        <a href="{% url 'edit' todo.id %}" class="icon-btn">
+                            <span class="edit-icon">✏️</span>
+                        </a>
+                        <a href="{% url 'delete' todo.id %}" class="icon-btn" onclick="return confirm('Delete this task?')">
+                            <span class="delete-icon">✕</span>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-state">
+                    <p>No tasks yet. Add one above!</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
